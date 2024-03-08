@@ -1,28 +1,50 @@
 <template>
   <div class="canvas" @dragover.prevent="onDragOver" @drop="onDrop">
-    <!-- 组件渲染区 -->
-    <div v-for="(component, index) in components" :key="index" class="canvas-item">
-      <!-- 动态组件渲染 -->
-      <component :is="getComponentType(component.type)" :initial-props="component.props" />
+    <div v-for="component in state.components" :key="component.id" class="canvas-item">
+      <component :is="getComponentType(component.type)" v-bind="component.props"></component>
     </div>
   </div>
 </template>
 
+
 <script>
-import { reactive, defineComponent } from 'vue';
+import { reactive, defineComponent, defineAsyncComponent } from 'vue';
+
+const EmailComponent = defineAsyncComponent(() => import('./Formelements/EmailInput.vue'));
+const PhoneComponent = defineAsyncComponent(() => import('./Formelements/PhoneInput.vue'));
+const URLComponent = defineAsyncComponent(() => import('./Formelements/UrlInput.vue'));
+const RegionComponent = defineAsyncComponent(() => import('./Formelements/RegionSelector.vue'));
+const IDComponent = defineAsyncComponent(() => import('./Formelements/IdentityCardInput.vue'));
+const InputComponent=defineAsyncComponent(() => import('./Formelements/TextInput.vue'));
+const TextareaComponent = defineAsyncComponent(() => import('./Formelements/TextareaInput.vue'));
+const NumberComponent = defineAsyncComponent(() => import('./Formelements/NumberInput.vue'));
+const RadioComponent = defineAsyncComponent(() => import('./Formelements/RadioButton.vue'));
+const CheckboxComponent = defineAsyncComponent(() => import('./Formelements/CheckBox.vue'));
+const SelectComponent = defineAsyncComponent(() => import('./Formelements/DropdownSelect.vue'));
+const TimeComponent = defineAsyncComponent(() => import('./Formelements/TimePicker.vue'));
+const DateComponent = defineAsyncComponent(() => import('./Formelements/DatePicker.vue'));
+const RateComponent = defineAsyncComponent(() => import('./Formelements/RatingInput.vue'));
+const SwitchComponent = defineAsyncComponent(() => import('./Formelements/ToggleSwitch.vue'));
+const SliderComponent = defineAsyncComponent(() => import('./Formelements/SliderInput.vue'));
+const FileComponent = defineAsyncComponent(() => import('./Formelements/FileUpload.vue'));
+const SignatureComponent = defineAsyncComponent(() => import('./Formelements/SignatureComponent.vue'));
+const RichTextComponent = defineAsyncComponent(() => import('./Formelements/RichTextEditor.vue'));
+const DividerComponent = defineAsyncComponent(() => import('./Formelements/AppDivider.vue'));
+const TabsComponent = defineAsyncComponent(() => import('./Formelements/TabsContainer.vue'));
+const SubformComponent = defineAsyncComponent(() => import('./Formelements/SubformContainer.vue'));
+const CollapseComponent = defineAsyncComponent(() => import('./Formelements/AccordionPanel.vue'));
+const GridComponent= defineAsyncComponent(() => import('./Formelements/grid/GridContainer.vue'));
+const GridColumn= defineAsyncComponent(() => import('./Formelements/grid/GridColumn.vue'));
+const GridRow= defineAsyncComponent(() => import('./Formelements/grid/GridRow.vue'));
+const TableComponent= defineAsyncComponent(() => import('./Formelements/Table/TableContainer.vue'));
+
 
 export default defineComponent({
   name: 'FormCanvas',
-  components: {
-    // 从 ToolboxItem.vue 导入所有基础表单组件
-    // 假设您有相应的表单组件，如下所示：
-    EmailComponent: () => import('./Formelements/EmailInput.vue'),
-    PhoneComponent: () => import('./Formelements/PhoneInput.vue'),
-    // ...其他表单组件
-  },
+  
   setup() {
     const state = reactive({
-      components: [], // 存储画布上的组件及其属性
+      components: [], 
     });
 
      function onDragOver(event) {
@@ -30,19 +52,62 @@ export default defineComponent({
      }
 
     function onDrop(event) {
-      const label = event.dataTransfer.getData('text/plain');
-      // 根据拖拽的标签来确定组件类型
-      const type = label.replace(/\s+/g, '') + 'Component'; // 去除空格并添加 'Component' 后缀
+      // 阻止默认行为以允许放置
+      event.preventDefault();
 
-      state.components.push({
-        type: type,
-        props: {}, // 可以根据需要设置默认属性
-      });
+      // 从拖拽事件中获取传输的数据
+      const dataString = event.dataTransfer.getData('application/json');
+      const data = JSON.parse(dataString);
+      
+
+      // 从数据中解析出组件类型和其他属性
+      const newComponent = {
+        id: Date.now(),
+        type: data.type + 'Component', 
+        isContainer: data.isContainer,
+        props: data.defaultProps || {}, 
+        children: data.isContainer ? [] : undefined, // 如果是容器，则初始化children数组
+      };
+
+      // 如果是放置到容器组件内，实现一些逻辑来确定放置位置
+      // 比如使用鼠标坐标与画布上已有组件的坐标进行比较等
+      // 先假设所有组件都是平级放置的，因此直接推入数组中
+      console.log(newComponent); 
+      state.components.push(newComponent);
     }
+    const componentMap = {
+      EmailComponent,
+      PhoneComponent,
+      URLComponent,
+      RegionComponent,
+      IDComponent,
+      InputComponent,
+      TextareaComponent,
+      NumberComponent,
+      RadioComponent,
+      CheckboxComponent,
+      SelectComponent,
+      TimeComponent,
+      DateComponent,
+      RateComponent,
+      SwitchComponent,
+      SliderComponent,
+      FileComponent,
+      SignatureComponent,
+      RichTextComponent,
+      DividerComponent,
+      TabsComponent,
+      SubformComponent ,
+      CollapseComponent,
+      GridComponent,
+      GridColumn,
+      TableComponent,
+      GridRow,
 
+      
+    };
     function getComponentType(type) {
-      // 根据 type 返回实际的组件
-      return this.$options.components[type];
+      return componentMap[type] || null;
     }
 
     return {

@@ -24,7 +24,7 @@ export default {
 };
 </script>
 
-<!-- Add styles as needed -->
+
 <style scoped>
 .form-group {
   margin-bottom: 15px;

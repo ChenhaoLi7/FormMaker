@@ -1,7 +1,7 @@
 <template>
   <div class="dynamic-form-container">
-    <div v-for="(item, index) in localItems" :key="item.key" class="component-wrapper">
-      <component :is="item.component" v-bind="item.props"></component>
+    <div v-for="item in localItems" :key="item.key" class="component-wrapper">
+     <component :is="item.component" v-bind="item.props"></component>
     </div>
     <button @click="addItem">Add New Component</button>
   </div>

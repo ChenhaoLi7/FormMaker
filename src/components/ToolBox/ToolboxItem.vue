@@ -36,6 +36,7 @@ export default {
   props: {
     label: String,
     icon: String,
+    isContainer: Boolean 
   },
   components: {
     EmailIcon,
@@ -66,7 +67,14 @@ export default {
   },
   methods: {
     onDragStart(event) {
-      event.dataTransfer.setData('text/plain', this.label);
+      const dragPayload = {
+        type: this.label.replace(/\s+/g, ''),
+        isContainer: this.isContainer, 
+        defaultProps: {
+          
+        } 
+      };
+      event.dataTransfer.setData('application/json', JSON.stringify(dragPayload));
     },
     getIconComponent(iconName) {
       const icons = {
