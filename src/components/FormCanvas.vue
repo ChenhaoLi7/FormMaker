@@ -58,7 +58,7 @@ export default defineComponent({
       // 从拖拽事件中获取传输的数据
       const dataString = event.dataTransfer.getData('application/json');
       const data = JSON.parse(dataString);
-      
+      console.log(data);
 
       // 从数据中解析出组件类型和其他属性
       const newComponent = {

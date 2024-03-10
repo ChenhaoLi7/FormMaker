@@ -68,7 +68,7 @@ export default {
 
 .upload-btn {
   padding: 10px 20px;
-  background-color: #007aff;
+  background-color: #00c3ff49;
   color: white;
   border-radius: 10px;
   cursor: pointer;

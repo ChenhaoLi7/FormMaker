@@ -32,6 +32,9 @@ import CollapseIcon from 'vue-material-design-icons/Collapse.vue';
 import DividerIcon from 'vue-material-design-icons/Divider.vue';
 import SubFormIcon from 'vue-material-design-icons/SubForm.vue';
 
+import { defaultProperties } from '@/config/defaultProps';
+
+
 export default {
   props: {
     label: String,
@@ -67,12 +70,14 @@ export default {
   },
   methods: {
     onDragStart(event) {
+      const ComponentType = this.label.replace(/\s+/g, '');
+      
+      //console.log(defaultProperties);
       const dragPayload = {
-        type: this.label.replace(/\s+/g, ''),
+        type: ComponentType,
         isContainer: this.isContainer, 
-        defaultProps: {
-          
-        } 
+
+        defaultProps:defaultProperties[ComponentType] || {}
       };
       event.dataTransfer.setData('application/json', JSON.stringify(dragPayload));
     },
