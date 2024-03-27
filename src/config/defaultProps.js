@@ -86,6 +86,15 @@ export const defaultProperties = {
       label: 'Slider Label',
       modelValue: 50 // 设定滑块的默认值
     },
+    Grid: {
+      rows: [
+        {
+          id: 1,
+          columns: [{ id: 1 }, { id: 2 }]
+        },
+        // 根据需要添加更多行和列的配置
+      ]
+    },
 
   };
-  
+

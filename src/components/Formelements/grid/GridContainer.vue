@@ -1,25 +1,62 @@
 <template>
   <div class="grid-container">
-    <slot></slot> <!-- 这里是其他组件的插槽 -->
+    <div v-for="(row, rowIndex) in rows" :key="`row-${rowIndex}`" class="grid-row">
+      <div v-for="(column, columnIndex) in row.columns" :key="`col-${rowIndex}-${columnIndex}`" class="grid-column">
+        <div v-for="child in children" :key="child.id">
+          <component v-if="children[rowIndex * row.columns.length + columnIndex]" 
+                   :is="getComponentType(children[rowIndex * row.columns.length + columnIndex].type)" 
+                   v-bind="children[rowIndex * row.columns.length + columnIndex].props">
+                   
+        </component>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
+
 <script>
-export default {
-  name: 'GridContainer'
-  // 如果需要，这里可以添加组件逻辑
-};
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'GridContainer',
+  props: {
+    rows: Array,
+    children: Array,
+    getComponentType: Function,
+  },
+  setup(props) {
+    return {
+      internalRows: props.rows,
+    };
+  },
+});
 </script>
 
 <style>
 .grid-container {
-  display: flex; /* 使用flex布局方便内部的GridRow布局 */
-  flex-direction: column; /* GridRow作为行，垂直堆叠 */
-  width: 100%; /* 占满父容器的宽度 */
-  gap: 10px; /* 行与行之间的间隙 */
-  padding: 10px; /* 内边距 */
-  border: 1px solid #ebebeb; /* 边框样式 */
-  border-radius: 4px; /* 圆角 */
-  overflow: hidden; /* 防止内容溢出 */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #ebebeb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.grid-row {
+  display: flex;
+  gap: 10px;
+}
+
+.grid-column {
+  flex-grow: 1;
+  border: 1px dashed #ccc;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
 }
 </style>

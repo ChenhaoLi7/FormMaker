@@ -59,10 +59,10 @@ export default {
 }
 
 .date-picker-footer {
-  /* Same styles as time-picker-footer */
+  
 }
 
 .date-picker-button {
-  /* Same styles as time-picker-button */
+ 
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="grid-column" @dragover.prevent="allowDrop" @drop="handleDrop">
-    <slot></slot> <!-- 插槽用于其他基础组件 -->
+    <slot>    </slot> 
   </div>
 </template>
 
@@ -9,7 +9,7 @@ export default {
   name: 'GridColumn',
   methods: {
     allowDrop() {
-      // 这里我们不需要event参数，所以可以移除它
+      
     },
     handleDrop(event) {
       const componentData = event.dataTransfer.getData('component');

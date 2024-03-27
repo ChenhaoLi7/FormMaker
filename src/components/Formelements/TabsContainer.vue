@@ -32,10 +32,10 @@ export default {
       activeTab: 1,
       tabs: [
         { id: 1, name: 'Tab 1', content: 'Drop here' },
-        { id: 2, name: 'Tab 2', content: '' },
-        { id: 3, name: 'Tab 3', content: '' },
-        { id: 4, name: 'Tab 4', content: '' },
-        { id: 5, name: 'Tab 5', content: '' },
+        { id: 2, name: 'Tab 2', content: 'Drop here' },
+        { id: 3, name: 'Tab 3', content: 'Drop here' },
+        { id: 4, name: 'Tab 4', content: 'Drop here' },
+        { id: 5, name: 'Tab 5', content: 'Drop here' },
       ],
     };
   },

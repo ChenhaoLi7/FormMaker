@@ -7,7 +7,7 @@
 <script>
 export default {
   name: 'GridRow'
-  // 如果需要，这里可以添加组件逻辑
+  
 };
 </script>
 

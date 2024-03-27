@@ -2,7 +2,7 @@
   
    
     <aside class="toolbox">
-      <ToolboxContainer /> <!-- 工具箱组件 -->
+      <ToolboxContainer /> 
     </aside>
     <main class="canvas">
       <!-- 这里将成为画布放置区，您可以通过拖放添加组件 -->
@@ -57,7 +57,7 @@ header {
 .toolbox {
   grid-area: toolbox;
   /* 添加侧边栏样式 */
-  background-color: #f4f4f4;
+  background-color: #bdcef9;
   padding: 10px;
   border-right: 1px solid #ccc;
 }

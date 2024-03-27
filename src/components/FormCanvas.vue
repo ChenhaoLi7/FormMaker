@@ -1,21 +1,33 @@
 <template>
+  <pre>{{ state.components }}</pre>
   <div class="canvas" @dragover.prevent="onDragOver" @drop="onDrop">
-    <div v-for="component in state.components" :key="component.id" class="canvas-item">
-      <component :is="getComponentType(component.type)" v-bind="component.props"></component>
+    <div v-for="component in state.components" :key="component.id" class="canvas-item"
+      :ref="component.isContainer ? setContainerRef : null" :data-container-id="component.id">
+
+      <component v-if="!component.isContainer" :is="getComponentType(component.type)" v-bind="component.props">
+      </component>
+
+      <component v-if="component.isContainer && getComponentType(component.type)" 
+        :is="getComponentType(component.type)"
+        :children="component.children" 
+        :getComponentType="getComponentType"
+        v-bind="component.props">
+      </component>
+
     </div>
   </div>
 </template>
 
 
 <script>
-import { reactive, defineComponent, defineAsyncComponent } from 'vue';
+import { reactive, defineComponent, defineAsyncComponent, onMounted, ref } from 'vue';
 
 const EmailComponent = defineAsyncComponent(() => import('./Formelements/EmailInput.vue'));
 const PhoneComponent = defineAsyncComponent(() => import('./Formelements/PhoneInput.vue'));
 const URLComponent = defineAsyncComponent(() => import('./Formelements/UrlInput.vue'));
 const RegionComponent = defineAsyncComponent(() => import('./Formelements/RegionSelector.vue'));
 const IDComponent = defineAsyncComponent(() => import('./Formelements/IdentityCardInput.vue'));
-const InputComponent=defineAsyncComponent(() => import('./Formelements/TextInput.vue'));
+const InputComponent = defineAsyncComponent(() => import('./Formelements/TextInput.vue'));
 const TextareaComponent = defineAsyncComponent(() => import('./Formelements/TextareaInput.vue'));
 const NumberComponent = defineAsyncComponent(() => import('./Formelements/NumberInput.vue'));
 const RadioComponent = defineAsyncComponent(() => import('./Formelements/RadioButton.vue'));
@@ -33,48 +45,77 @@ const DividerComponent = defineAsyncComponent(() => import('./Formelements/AppDi
 const TabsComponent = defineAsyncComponent(() => import('./Formelements/TabsContainer.vue'));
 const SubformComponent = defineAsyncComponent(() => import('./Formelements/SubformContainer.vue'));
 const CollapseComponent = defineAsyncComponent(() => import('./Formelements/AccordionPanel.vue'));
-const GridComponent= defineAsyncComponent(() => import('./Formelements/grid/GridContainer.vue'));
-const GridColumn= defineAsyncComponent(() => import('./Formelements/grid/GridColumn.vue'));
-const GridRow= defineAsyncComponent(() => import('./Formelements/grid/GridRow.vue'));
-const TableComponent= defineAsyncComponent(() => import('./Formelements/Table/TableContainer.vue'));
+const GridComponent = defineAsyncComponent(() => import('./Formelements/grid/GridContainer.vue'));
+const GridColumn = defineAsyncComponent(() => import('./Formelements/grid/GridColumn.vue'));
+const GridRow = defineAsyncComponent(() => import('./Formelements/grid/GridRow.vue'));
+const TableComponent = defineAsyncComponent(() => import('./Formelements/Table/TableContainer.vue'));
 
 
 export default defineComponent({
   name: 'FormCanvas',
-  
+
   setup() {
     const state = reactive({
-      components: [], 
+      components: [],
     });
 
-     function onDragOver(event) {
+    const containerRefs = ref(new Map());
+
+    function onDragOver(event) {
       event.preventDefault();
-     }
+    }
 
     function onDrop(event) {
-      // 阻止默认行为以允许放置
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
       event.preventDefault();
-
-      // 从拖拽事件中获取传输的数据
       const dataString = event.dataTransfer.getData('application/json');
       const data = JSON.parse(dataString);
-      console.log(data);
 
-      // 从数据中解析出组件类型和其他属性
+
+
       const newComponent = {
         id: Date.now(),
-        type: data.type + 'Component', 
+        type: data.type + 'Component',
         isContainer: data.isContainer,
-        props: data.defaultProps || {}, 
-        children: data.isContainer ? [] : undefined, // 如果是容器，则初始化children数组
+        props: data.defaultProps || {},
+        children: data.isContainer ? [] : undefined,
       };
 
-      // 如果是放置到容器组件内，实现一些逻辑来确定放置位置
-      // 比如使用鼠标坐标与画布上已有组件的坐标进行比较等
-      // 先假设所有组件都是平级放置的，因此直接推入数组中
-      console.log(newComponent); 
+      for (const container of state.components.filter(c => c.isContainer)) {
+
+        console.log("containerRef", containerRefs.value);
+        console.log("type", container.type);
+        for (const [id, element] of containerRefs.value.entries()) {
+          console.log("打印", id, element);
+
+
+
+
+          const rect = element.getBoundingClientRect();
+          if (mouseX >= rect.left && mouseX <= rect.right && mouseY >= rect.top && mouseY <= rect.bottom) {
+            container.children.push(newComponent);
+            return;
+          }
+
+        }
+
+      }
+
       state.components.push(newComponent);
     }
+
+    function setContainerRef(el) {
+      if (el) {
+        const id = el.dataset.containerId;
+        containerRefs.value.set(id, el);
+      }
+    }
+
+    onMounted(() => {
+
+      containerRefs.value.clear();
+    });
     const componentMap = {
       EmailComponent,
       PhoneComponent,
@@ -97,14 +138,14 @@ export default defineComponent({
       RichTextComponent,
       DividerComponent,
       TabsComponent,
-      SubformComponent ,
+      SubformComponent,
       CollapseComponent,
       GridComponent,
       GridColumn,
       TableComponent,
       GridRow,
 
-      
+
     };
     function getComponentType(type) {
       return componentMap[type] || null;
@@ -115,6 +156,7 @@ export default defineComponent({
       onDragOver,
       onDrop,
       getComponentType,
+      setContainerRef,
     };
   },
 });
@@ -128,25 +170,28 @@ export default defineComponent({
   min-height: 800px;
   flex-direction: column;
   padding: 10px;
-  overflow-y: auto; /* 允许垂直方向滚动 */
-  /* 自定义滚动条样式 */
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(128, 128, 128, 0.5) transparent; /* Firefox */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 128, 0.5) transparent;
+
 }
 
-/* Chrome, Edge, and Safari */
+
 .canvas::-webkit-scrollbar {
-  width: 12px; /* 滚动条宽度 */
+  width: 12px;
+
 }
 
 .canvas::-webkit-scrollbar-track {
-  background: transparent; /* 滚动条轨道颜色 */
+  background: transparent;
+
 }
 
 .canvas::-webkit-scrollbar-thumb {
-  background-color: rgba(128, 128, 128, 0.5); /* 滚动条颜色 */
-  border-radius: 6px; /* 滚动条圆角 */
-  border: 3px solid transparent; /* 滚动条边框 */
+  background-color: rgba(128, 128, 128, 0.5);
+  border-radius: 6px;
+  border: 3px solid transparent;
+
 }
 
 .canvas-item {
