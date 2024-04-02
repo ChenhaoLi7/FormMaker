@@ -92,9 +92,39 @@ export const defaultProperties = {
           id: 1,
           columns: [{ id: 1 }, { id: 2 }]
         },
-        // 根据需要添加更多行和列的配置
+        
       ]
     },
+    Table: {
+      rows: [
+        {
+          id: 1,
+          columns: [{ id: 1 }, { id: 2 }]
+        },
+        {
+          id: 2,
+          columns: [{ id: 1 }, { id: 2 }]
+        }
+      ]
+    },
+    Tabs: {
+      tabs: [
+        { id: 1, name: '标签页 1' },
+        { id: 2, name: '标签页 2' },
+        { id: 3, name: '标签页 3' },
+        { id: 4, name: '标签页 4' },
+      
+      ]
+    },
+    Collapse: {
+      panels: [
+        { name: 'Tab 1', isOpen: false },
+        { name: 'Tab 2', isOpen: false },
+        { name: 'Tab 3', isOpen: false },
+        
+      ]
+    },
+   
 
   };
 

@@ -1,56 +1,79 @@
 <template>
-  <div class="dynamic-form-container">
-    <div v-for="item in localItems" :key="item.key" class="component-wrapper">
-     <component :is="item.component" v-bind="item.props"></component>
+  <div class="subform-container">
+    <!-- 使用本地副本 localChildren 渲染子组件 -->
+    <div v-for="(child, index) in localChildren" :key="index" class="subform-item">
+      <component :is="getComponentType(child.type)" v-bind="child.props"></component>
     </div>
-    <button @click="addItem">Add New Component</button>
+    <!-- 点击克隆最后一个子组件 -->
+    <button class="clone-button" @click="cloneComponent">Clone Component</button>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'DynamicFormContainer',
+  name: 'SubformContainer',
   props: {
-    items: {
-      type: Array,
-      required: true
-    }
+    children: Array,
+    getComponentType: Function,
   },
   data() {
     return {
-      // 使用本地数据复制props以避免直接修改props
-      localItems: JSON.parse(JSON.stringify(this.items))
+      localChildren: [],
     };
   },
-  methods: {
-    addItem() {
-      // 假设添加的是最后一个组件的复制，这里需要根据实际情况调整
-      const lastItem = this.localItems[this.localItems.length - 1];
-      const newItem = { ...lastItem, key: Date.now() }; // 使用新的key
-      this.localItems.push(newItem);
-    }
-  },
   watch: {
-    // 监听props的变化，以更新本地数据
-    items: {
-      deep: true,
+   
+    children: {
+      immediate: true, // 立即执行，以便于组件初始化时处理
+      deep: true, // 深度监听，以便于监听数组和对象内部值的变化
       handler(newVal) {
-        this.localItems = JSON.parse(JSON.stringify(newVal));
-      }
-    }
-  }
+        this.localChildren = newVal.map(child => ({...child}));
+      },
+    },
+  },
+  methods: {
+    cloneComponent() {
+      const lastIndex = this.localChildren.length - 1;
+      if (lastIndex < 0) return;
+      
+      const clonedChild = { 
+        ...this.localChildren[lastIndex], 
+        id: Date.now() // 确保每个克隆的 child 有一个唯一的 id
+      };
+      this.localChildren.push(clonedChild);
+    },
+  },
 };
 </script>
 
+
+
+
+
 <style scoped>
-.dynamic-form-container {
-  /* 添加容器的样式 */
+.subform-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
-.component-wrapper {
+.subform-item {
   margin-bottom: 10px;
-  /* 添加组件包装器的样式 */
 }
 
-/* 添加更多样式 */
+.clone-button {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  outline: none;
+  margin-top: 10px;
+}
+
+.clone-button:hover {
+  background-color: #0051a3;
+}
 </style>

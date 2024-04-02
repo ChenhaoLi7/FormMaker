@@ -1,17 +1,16 @@
 <template>
-  <pre>{{ state.components }}</pre>
+
   <div class="canvas" @dragover.prevent="onDragOver" @drop="onDrop">
     <div v-for="component in state.components" :key="component.id" class="canvas-item"
-      :ref="component.isContainer ? setContainerRef : null" :data-container-id="component.id">
+      :ref="component.isContainer ? setContainerRef : null" :data-container-id="component.id"
+     
+    >
 
       <component v-if="!component.isContainer" :is="getComponentType(component.type)" v-bind="component.props">
       </component>
 
-      <component v-if="component.isContainer && getComponentType(component.type)" 
-        :is="getComponentType(component.type)"
-        :children="component.children" 
-        :getComponentType="getComponentType"
-        v-bind="component.props">
+      <component v-if="component.isContainer && getComponentType(component.type)" :is="getComponentType(component.type)"
+        :children="component.children" :getComponentType="getComponentType" v-bind="component.props">
       </component>
 
     </div>
@@ -21,7 +20,6 @@
 
 <script>
 import { reactive, defineComponent, defineAsyncComponent, onMounted, ref } from 'vue';
-
 const EmailComponent = defineAsyncComponent(() => import('./Formelements/EmailInput.vue'));
 const PhoneComponent = defineAsyncComponent(() => import('./Formelements/PhoneInput.vue'));
 const URLComponent = defineAsyncComponent(() => import('./Formelements/UrlInput.vue'));
@@ -45,18 +43,17 @@ const DividerComponent = defineAsyncComponent(() => import('./Formelements/AppDi
 const TabsComponent = defineAsyncComponent(() => import('./Formelements/TabsContainer.vue'));
 const SubformComponent = defineAsyncComponent(() => import('./Formelements/SubformContainer.vue'));
 const CollapseComponent = defineAsyncComponent(() => import('./Formelements/AccordionPanel.vue'));
-const GridComponent = defineAsyncComponent(() => import('./Formelements/grid/GridContainer.vue'));
-const GridColumn = defineAsyncComponent(() => import('./Formelements/grid/GridColumn.vue'));
-const GridRow = defineAsyncComponent(() => import('./Formelements/grid/GridRow.vue'));
-const TableComponent = defineAsyncComponent(() => import('./Formelements/Table/TableContainer.vue'));
+const GridComponent = defineAsyncComponent(() => import('./Formelements/GridContainer.vue'));
+const TableComponent = defineAsyncComponent(() => import('./Formelements/TableContainer.vue'));
 
 
 export default defineComponent({
   name: 'FormCanvas',
-
+  
   setup() {
     const state = reactive({
       components: [],
+
     });
 
     const containerRefs = ref(new Map());
@@ -64,14 +61,14 @@ export default defineComponent({
     function onDragOver(event) {
       event.preventDefault();
     }
-
+    
     function onDrop(event) {
       const mouseX = event.clientX;
       const mouseY = event.clientY;
       event.preventDefault();
       const dataString = event.dataTransfer.getData('application/json');
       const data = JSON.parse(dataString);
-
+      //console.log("data",data);
 
 
       const newComponent = {
@@ -83,15 +80,9 @@ export default defineComponent({
       };
 
       for (const container of state.components.filter(c => c.isContainer)) {
-
-        console.log("containerRef", containerRefs.value);
-        console.log("type", container.type);
+        console.log("props", container.props);
         for (const [id, element] of containerRefs.value.entries()) {
           console.log("打印", id, element);
-
-
-
-
           const rect = element.getBoundingClientRect();
           if (mouseX >= rect.left && mouseX <= rect.right && mouseY >= rect.top && mouseY <= rect.bottom) {
             container.children.push(newComponent);
@@ -111,6 +102,8 @@ export default defineComponent({
         containerRefs.value.set(id, el);
       }
     }
+   
+
 
     onMounted(() => {
 
@@ -141,11 +134,7 @@ export default defineComponent({
       SubformComponent,
       CollapseComponent,
       GridComponent,
-      GridColumn,
       TableComponent,
-      GridRow,
-
-
     };
     function getComponentType(type) {
       return componentMap[type] || null;

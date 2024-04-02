@@ -1,58 +1,51 @@
 <template>
   <div class="tabs-container">
+  
     <ul class="tabs">
-      <li
-        v-for="tab in tabs"
-        :key="tab.id"
-        :class="{ active: tab.id === activeTab }"
-        @click="activeTab = tab.id"
-      >
+      <li v-for="tab in tabs" :key="tab.id" :class="{ active: tab.id === activeTab }" @click="changeTab(tab.id)">
         {{ tab.name }}
       </li>
     </ul>
     <div class="tabs-content">
-      <div
-        v-for="tab in tabs"
-        :key="tab.id"
-        :class="{ 'content-active': tab.id === activeTab }"
-        @drop="handleDrop"
-        @dragover.prevent
-      >
-        <!-- 拖放内容将会在这里显示 -->
-        {{ tab.content }}
-      </div>
+      <component v-for="child in activeTabChildren" :key="child.id" :is="getComponentType(child.type)"
+        v-bind="child.props" />
+
+
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    tabs: Array,
+    children: Array,
+    getComponentType: Function,
+  },
   data() {
     return {
       activeTab: 1,
-      tabs: [
-        { id: 1, name: 'Tab 1', content: 'Drop here' },
-        { id: 2, name: 'Tab 2', content: 'Drop here' },
-        { id: 3, name: 'Tab 3', content: 'Drop here' },
-        { id: 4, name: 'Tab 4', content: 'Drop here' },
-        { id: 5, name: 'Tab 5', content: 'Drop here' },
-      ],
     };
   },
-  methods: {
-    handleDrop(event) {
-      const data = event.dataTransfer.getData('text');
-      // 在这里处理拖放逻辑
-      // 例如更新当前激活标签的内容
-      this.tabs.find(tab => tab.id === this.activeTab).content = data;
-    },
+  computed: {
+    activeTabChildren() {
+      const child = this.children[this.activeTab - 1];
+      return child ? [child] : [];
+    }
   },
+
+  methods: {
+    changeTab(tabId) {
+      this.activeTab = tabId;
+    },
+  }
 };
 </script>
 
+
 <style scoped>
 .tabs-container {
-  /* 样式调整以匹配您的模板 */
+  /* 你的容器样式 */
 }
 
 .tabs {
@@ -79,15 +72,5 @@ export default {
   padding: 20px;
 }
 
-.content-active {
-  display: block;
-}
 
-.tabs-content > div {
-  display: none;
-}
-
-.tabs-content > .content-active {
-  display: block;
-}
 </style>

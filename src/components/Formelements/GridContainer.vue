@@ -2,12 +2,10 @@
   <div class="grid-container">
     <div v-for="(row, rowIndex) in rows" :key="`row-${rowIndex}`" class="grid-row">
       <div v-for="(column, columnIndex) in row.columns" :key="`col-${rowIndex}-${columnIndex}`" class="grid-column">
-        <div v-for="child in children" :key="child.id">
-          <component v-if="children[rowIndex * row.columns.length + columnIndex]" 
-                   :is="getComponentType(children[rowIndex * row.columns.length + columnIndex].type)" 
-                   v-bind="children[rowIndex * row.columns.length + columnIndex].props">
-                   
-        </component>
+        <div v-for="(child, index) in children" :key="child.id">
+          <component v-if="index === rowIndex * row.columns.length + columnIndex" :is="getComponentType(child.type)"
+            v-bind="child.props">
+          </component>
         </div>
       </div>
     </div>
@@ -30,7 +28,10 @@ export default defineComponent({
       internalRows: props.rows,
     };
   },
+  
+
 });
+
 </script>
 
 <style>

@@ -1,18 +1,14 @@
 <template>
   <div class="accordion">
-    <div v-for="(panel, index) in panels" :key="panel.name" class="panel">
+    <div v-for="(panel, index) in panels" :key="panel.id" class="panel">
       <button class="accordion-header" @click="togglePanel(index)">
         {{ panel.name }}
-        <span class="icon">{{ panel.isOpen ? '▼' : '▶' }}</span>
+        <span class="icon">{{ isOpen(index) ? '▼' : '▶' }}</span>
       </button>
       <transition name="fade">
-        <div class="accordion-content" v-if="panel.isOpen">
-          <div class="drop-area" v-if="!panel.content" @drop="handleDrop(panel, $event)" @dragover.prevent>
-            Drop here
-          </div>
-          <div v-else>
-            {{ panel.content }}
-          </div>
+        <div class="accordion-content" v-show="isOpen(index)">
+          <component v-if="children[index]" :is="getComponentType(children[index].type)"
+            v-bind="children[index].props" />
         </div>
       </transition>
     </div>
@@ -21,60 +17,61 @@
 
 <script>
 export default {
-  name: 'AccordionPanel',
+  props: {
+    panels: Array, 
+    children: Array,
+    getComponentType: Function,
+  },
   data() {
     return {
-      panels: [
-        { name: 'Tab 1', content: '', isOpen: false },
-        { name: 'Tab 2', content: '', isOpen: false },
-        { name: 'Tab 3', content: '', isOpen: false },
-      ],
+      activePanelIndex: null, 
     };
   },
   methods: {
     togglePanel(index) {
-      this.panels[index].isOpen = !this.panels[index].isOpen;
+      this.activePanelIndex = this.activePanelIndex === index ? null : index;
     },
-    handleDrop(panel, event) {
-      const data = event.dataTransfer.getData('text');
-      panel.content = data;
+    isOpen(index) {
+      return this.activePanelIndex === index;
     },
-  },
+  }
 };
 </script>
 
 <style scoped>
 .accordion-header {
-  /* 样式 */
   background-color: #f5f5f5;
-  border: none;
-  padding: 10px;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
+  color: #333; 
+  padding: 10px 15px; 
+  margin: 5px 0; 
+  cursor: pointer; 
+  border: none; 
+  width: 100%; 
+  text-align: left; 
+  outline: none; 
+  transition: background-color 0.3s; 
+}
+
+.accordion-header:hover {
+  background-color: #eaeaea; 
 }
 
 .accordion-content {
-  padding: 10px;
+  padding: 20px; 
   border: 1px solid #ccc;
-  border-top: none;
-}
-
-.drop-area {
-  border: 2px dashed #ccc;
-  padding: 20px;
-  text-align: center;
+  border-top: none; 
+  /* display: none;  */
 }
 
 .icon {
-  float: right;
+  float: right; 
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity 0.5s; 
 }
 
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
+.fade-enter, .fade-leave-to  {
+  opacity: 0; 
 }
 </style>

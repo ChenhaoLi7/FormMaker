@@ -58,6 +58,6 @@ export default {
   appearance: none;
 }
 
-/* 样式调整以符合苹果风格 */
+
 </style>
 
